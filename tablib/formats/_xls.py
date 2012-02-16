@@ -24,7 +24,7 @@ def detect(stream):
         xlrd.open_workbook(file_contents=stream)
         return True
     except (TypeError, XLRDError):
-        pass 
+        pass
     try:
         xlrd.open_workbook(file_contents=stream.read())
         return True
@@ -36,6 +36,22 @@ def detect(stream):
     except:
         return False
 
+
+def import_set(dset, in_stream, headers=True):
+    """Returns dataset from XLS stream. Default sheet 1"""
+
+    dset.wipe()
+
+    book = xlrd.open_workbook(in_stream)
+    sheet = book.sheet_by_index(0)
+    ncols = sheet.ncols
+    for row in range(sheet.nrows):
+        row_list = [sheet.cell(row,col).value for col in range(ncols)]
+
+        if (row == 0) and (headers):
+            dset.headers = row_list
+        else:
+            dset.append(row_list)
 
 def export_set(dataset):
     """Returns XLS representation of Dataset."""

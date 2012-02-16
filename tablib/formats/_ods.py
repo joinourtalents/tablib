@@ -19,13 +19,21 @@ extentions = ('ods',)
 bold = style.Style(name="bold", family="paragraph")
 bold.addElement(style.TextProperties(fontweight="bold", fontweightasian="bold", fontweightcomplex="bold"))
 
+def detect(stream):
+    """Returns True if given stream is a readable excel file."""
+    try:
+        doc = opendocument.load(stream)
+        return True
+    except:
+        return False
+
 def export_set(dataset):
     """Returns ODF representation of Dataset."""
 
     wb = opendocument.OpenDocumentSpreadsheet()
     wb.automaticstyles.addElement(bold)
 
-    ws = table.Table(name=dataset.title if dataset.title else 'Tablib Dataset')
+    ws = table.Table(name=dataset.tzitle if dataset.title else 'Tablib Dataset')
     wb.spreadsheet.addElement(ws)
     dset_sheet(dataset, ws)
 
@@ -49,6 +57,48 @@ def export_book(databook):
     stream = BytesIO()
     wb.save(stream)
     return stream.getvalue()
+
+
+def import_set(dset, in_stream, headers=True):
+    """Returns dataset from ODS stream. Default sheet 1"""
+    dset.wipe()
+
+    doc = opendocument.load(in_stream)
+    sheet = doc.spreadsheet.childNodes[0]
+    rows = sheet.getElementsByType(table.TableRow)
+    for row in rows:
+        cells = row.getElementsByType(table.TableCell)
+        arrCells = []
+        cell_count = 0
+        for cell in cells:
+            # repeated value?
+            repeat = cell.getAttribute("numbercolumnsrepeated")
+            if(not repeat):
+                repeat = 1
+
+            ps = cell.getElementsByType(text.P)
+            textContent = ""
+
+            # for each text node
+            for p in ps:
+                c = p.firstChild
+                txt = p.__str__()
+                textContent = textContent + txt
+
+            if textContent and textContent[0] != "#": # ignore comments cells
+                for rr in range(int(repeat)): # repeated?
+                    arrCells.append(textContent)
+                    cell_count += 1
+            else:
+                arrCells.append("")
+
+        if (row == 0) and (headers):
+            dset.headers = arrCells
+        elif cell_count > 1:
+            # empty cells are needed, but last string == ['']
+            dset.append(arrCells)
+        else:
+            pass
 
 
 def dset_sheet(dataset, ws):

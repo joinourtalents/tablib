@@ -23,6 +23,19 @@ from tablib.compat import unicode
 title = 'xlsx'
 extentions = ('xlsx',)
 
+def detect(stream):
+    """Returns True if given stream is a readable excel file."""
+    try:
+        openpyxl.reader.excel.load_workbook(stream)
+        return True
+    except:
+        pass
+    try:
+        openpyxl.reader.excel.load_workbook(in_stream.read())
+        return True
+    except:
+        return False
+
 def export_set(dataset):
     """Returns XLSX representation of Dataset."""
 
@@ -52,6 +65,19 @@ def export_book(databook):
     stream = BytesIO()
     ew.save(stream)
     return stream.getvalue()
+
+def import_set(dset, in_stream, headers=True):
+    """Returns dataset from XLSX stream. Default sheet 1"""
+
+    book = openpyxl.reader.excel.load_workbook(in_stream)
+    sheet = book.get_active_sheet()
+    for i, row in enumerate(sheet.rows):
+        row_list = [cell.value for cell in row]
+
+        if (i == 0) and (headers):
+            dset.headers = row_list
+        else:
+            dset.append(row_list)
 
 
 def dset_sheet(dataset, ws):

@@ -33,6 +33,7 @@ def import_set(dset, in_stream, headers=True):
     """Returns dataset from CSV stream."""
 
     dset.wipe()
+    in_stream = open(in_stream).read()
 
     if is_py3:
         rows = csv.reader(in_stream.splitlines())
@@ -49,7 +50,7 @@ def import_set(dset, in_stream, headers=True):
 def detect(stream):
     """Returns True if given stream is valid CSV."""
     try:
-        csv.Sniffer().sniff(stream)
+        csv.Sniffer().sniff(open(stream).read())
         return True
     except (csv.Error, TypeError):
         return False

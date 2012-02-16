@@ -12,4 +12,4 @@ from . import _html as html
 from . import _xlsx as xlsx
 from . import _ods as ods
 
-available = (json, xls, yaml, csv, tsv, html, xlsx, ods)
+available = (json, xls, xlsx, yaml, ods, csv, tsv, html)
