@@ -33,7 +33,7 @@ def export_set(dataset):
     wb = opendocument.OpenDocumentSpreadsheet()
     wb.automaticstyles.addElement(bold)
 
-    ws = table.Table(name=dataset.tzitle if dataset.title else 'Tablib Dataset')
+    ws = table.Table(name=dataset.title if dataset.title else 'Tablib Dataset')
     wb.spreadsheet.addElement(ws)
     dset_sheet(dataset, ws)
 
