@@ -81,9 +81,8 @@ def import_set(dset, in_stream, headers=True):
 
             # for each text node
             for p in ps:
-                c = p.firstChild
-                txt = p.__str__()
-                textContent = textContent + txt
+                c = p.firstChild  # TODO: Where is it used?
+                textContent = textContent + unicode(txt)
 
             if textContent and textContent[0] != "#": # ignore comments cells
                 for rr in range(int(repeat)): # repeated?
