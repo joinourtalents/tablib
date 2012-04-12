@@ -66,6 +66,7 @@ def import_set(dset, in_stream, headers=True):
     doc = opendocument.load(in_stream)
     sheet = doc.spreadsheet.childNodes[0]
     rows = sheet.getElementsByType(table.TableRow)
+    row_count = 0
     for row in rows:
         cells = row.getElementsByType(table.TableCell)
         arrCells = []
@@ -91,13 +92,14 @@ def import_set(dset, in_stream, headers=True):
             else:
                 arrCells.append("")
 
-        if (row == 0) and (headers):
+        if row_count == 0 and headers:
             dset.headers = arrCells
         elif cell_count > 1:
             # empty cells are needed, but last string == ['']
             dset.append(arrCells)
         else:
             pass
+        row_count += 1
 
 
 def dset_sheet(dataset, ws):
